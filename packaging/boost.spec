@@ -6,6 +6,7 @@ License: Boost
 URL: http://www.boost.org/
 Group: System/Libraries
 Source: boost-1.46.1.tar.gz
+Source1001: packaging/boost.manifest 
 Obsoletes: boost-doc <= 1.30.2
 Obsoletes: boost-python <= 1.30.2
 Provides: boost-doc = %{version}-%{release}
@@ -111,6 +112,7 @@ HTML documentation files for Boost C++ libraries.
 #%patch7 -p0
 
 %build
+cp %{SOURCE1001} .
 BOOST_ROOT=`pwd`
 export BOOST_ROOT
 
@@ -273,29 +275,36 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %files
+%manifest boost.manifest
 
 %files program-options
+%manifest boost.manifest
 %defattr(-, root, root, -)
 %{_libdir}/libboost_program_options*.so.%{version}
 
 %files thread
+%manifest boost.manifest
 %defattr(-, root, root, -)
 %{_libdir}/libboost_thread*.so.%{version}
 
 %files doc
+%manifest boost.manifest
 %defattr(-, root, root, -)
 %doc %{_docdir}/%{name}-%{version}
 
 %files devel
+%manifest boost.manifest
 %defattr(-, root, root, -)
 %{_includedir}/boost
 %{_libdir}/*.so
 
 %files static
+%manifest boost.manifest
 %defattr(-, root, root, -)
 %{_libdir}/*.a
 
 %files test
+%manifest boost.manifest
 %defattr(-, root, root, -)
 %{_libdir}/libboost_unit_test_framework*.so.%{version}
 %{_libdir}/libboost_prg_exec_monitor*.so.%{version}
