@@ -1,0 +1,42 @@
+Source: boost
+Section: libs
+Priority: optional
+Maintainer: Hyunju Shin <hyunjushin@samsung.com>, Sin-Jae Lee <sinjae4b.lee@samsung.com>, Jonghyun Ho <jonghyun.ho@samsung.com>, MinSeo Park <minseo.park@samsung.com>
+Build-Depends: gettext
+Standards-Version: 3.7.2
+
+Package: libboost-dev
+Section: libdevel
+Architecture: any
+XB-Generate-Docs: yes
+Depends: ${misc:Depends},
+         ${shlibs:Depends}
+Description: Boost Development files
+
+Package: libboost-filesystem
+Section: libs
+Architecture: any
+Depends: ${misc:Depends},
+         ${shlibs:Depends}
+Description: Boost file system
+
+Package: libboost-program-options
+Section: libs
+Architecture: any
+Depends: ${misc:Depends},
+         ${shlibs:Depends}
+Description: Boost Program Options
+
+Package: libboost-thread
+Section: libs
+Architecture: any
+Depends: ${misc:Depends},
+         ${shlibs:Depends}
+Description: Boost Thread
+
+Package: libboost-system
+Section: libs
+Architecture: any
+Depends: ${misc:Depends},
+         ${shlibs:Depends}
+Description: Boost system

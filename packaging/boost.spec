@@ -1,7 +1,7 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.46.1
-Release: 4
+Release: 5
 License: Boost
 URL: http://www.boost.org/
 Group: System/Libraries
@@ -14,6 +14,8 @@ Provides: boost-doc = %{version}-%{release}
 Requires: boost-program-options = %{version}-%{release}
 Requires: boost-thread = %{version}-%{release}
 Requires: boost-test = %{version}-%{release}
+Requires: boost-filesystem = %{version}-%{release}
+Requires: boost-system = %{version}-%{release}
 
 BuildRequires: libstdc++-devel
 BuildRequires: bzip2-libs
@@ -59,12 +61,38 @@ functions for managing multiple threads of execution, and for
 synchronizing data between the threads or providing separate copies of
 data specific to individual threads.
 
+
+%package system
+Summary:  Runtime component of boost system library
+Group: System/Libraries
+Provides: libboost_system.so.%{version}
+
+%description system
+
+Runtime component Boost. System library, which provides simple, light-weight
+error_code objects that encapsulate system-specific error code values,
+yet also provide access to more abstract and portable error conditions via
+error_condition objects.
+
+%package filesystem
+Summary:  Runtime component of boost filesystem library
+Group: System/Libraries
+Provides: libboost_filesystem.so.%{version}
+
+%description filesystem
+
+Runtime component Boost. FileSystem library, which provides facilities
+to manipulate files and directories, and the paths that identify them.
+
+
 %package devel
 Summary: The Boost C++ headers and shared development libraries
 Group: Development/Libraries
 Requires: boost = %{version}-%{release}
 Requires: boost-program-options = %{version}-%{release}
 Requires: boost-thread = %{version}-%{release}
+Provides: boost-system = %{version}-%{release}
+Provides: boost-filesystem = %{version}-%{release}
 Provides: boost-devel = %{version}-%{release}
 
 %description devel
@@ -114,7 +142,7 @@ HTML documentation files for Boost C++ libraries.
 BOOST_ROOT=`pwd`
 export BOOST_ROOT
 
-BOOST_LIBS="program_options,thread,test"
+BOOST_LIBS="program_options,thread,system,filesystem,test"
 
 # build make tools, ie bjam, necessary for building libs, docs, and testing
 #(cd tools/jam/src && ./build.sh)
@@ -192,6 +220,7 @@ done;
 for i in `find stage \( -type f -o -type l \) -name \*.so*`; do
   NAME=`basename $i`;
   install -p -m 0644 $i $RPM_BUILD_ROOT%{_libdir}/$NAME;
+  strip $RPM_BUILD_ROOT%{_libdir}/$NAME;
 #  SONAME=$i.%{sonamever};
 #  VNAME=$i.%{version};
 #  base=`basename $i`;
@@ -252,6 +281,16 @@ rm -rf $RPM_BUILD_ROOT
 %postun thread -p /sbin/ldconfig
 
 
+%post system -p /sbin/ldconfig
+
+%postun system -p /sbin/ldconfig
+
+
+%post filesystem -p /sbin/ldconfig
+
+%postun filesystem -p /sbin/ldconfig
+
+
 %post doc -p /sbin/ldconfig
 
 %postun doc -p /sbin/ldconfig
@@ -281,6 +320,14 @@ rm -rf $RPM_BUILD_ROOT
 %files thread
 %defattr(-, root, root, -)
 %{_libdir}/libboost_thread*.so.%{version}
+
+%files system
+%defattr(-, root, root, -)
+%{_libdir}/libboost_system*.so.%{version}
+
+%files filesystem
+%defattr(-, root, root, -)
+%{_libdir}/libboost_filesystem*.so.%{version}
 
 %files doc
 %defattr(-, root, root, -)
