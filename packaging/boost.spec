@@ -18,6 +18,7 @@ Requires: boost-test = %{version}-%{release}
 Requires: boost-filesystem = %{version}-%{release}
 Requires: boost-system = %{version}-%{release}
 Requires: boost-date-time = %{version}-%{release}
+Requires: boost-regex = %{version}-%{release}
 
 BuildRequires: libstdc++-devel
 BuildRequires: bzip2-libs
@@ -69,6 +70,7 @@ functions for managing multiple threads of execution, and for
 synchronizing data between the threads or providing separate copies of
 data specific to individual threads.
 
+
 %package system
 Summary:  Runtime component of boost system library
 Group: System/Libraries
@@ -101,15 +103,20 @@ Provides: libboost_date_time.so.%{version}
 The motivation for this library comes from working with and helping build several date-time libraries on several projects. 
 Date-time libraries provide fundamental infrastructure for most development projects. 
 
+%package regex
+Summary: Runtime component of boost system library
+Group: System/Libraries
+Provides: libboost_regex.so.%{version}
+Requires: libicu
+
+%description regex
+
+Runtime support for boost regular expression library.
+
 %package devel
 Summary: The Boost C++ headers and shared development libraries
 Group: Development/Libraries
 Requires: boost = %{version}-%{release}
-Requires: boost-program-options = %{version}-%{release}
-Requires: boost-thread = %{version}-%{release}
-Provides: boost-system = %{version}-%{release}
-Provides: boost-filesystem = %{version}-%{release}
-Provides: boost-date-time = %{version}-%{release}
 Provides: boost-devel = %{version}-%{release}
 
 %description devel
@@ -159,11 +166,12 @@ HTML documentation files for Boost C++ libraries.
 BOOST_ROOT=`pwd`
 export BOOST_ROOT
 
-BOOST_LIBS="program_options,thread,system,filesystem,date_time,test"
+BOOST_LIBS="program_options,thread,system,filesystem,date_time,regex,test"
+REGEX_FLAGS="--with-icu"
 
 # build make tools, ie bjam, necessary for building libs, docs, and testing
 #(cd tools/jam/src && ./build.sh)
-./bootstrap.sh --with-libraries=$BOOST_LIBS
+./bootstrap.sh --with-libraries=$BOOST_LIBS $REGEX_FLAGS
 BJAM=`find . -name bjam -a -type f`
 ./bjam
 
@@ -231,6 +239,10 @@ mkdir -p $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}
 
 mkdir -p %{buildroot}/%{_datadir}/license
 cp -rf %{_builddir}/%{name}-%{version}/packaging/%{name} %{buildroot}/%{_datadir}/license
+
+# LICENSE
+mkdir -p %{buildroot}/usr/share/license
+cp -af packaging/boost %{buildroot}/usr/share/license/%{name}
 
 # install lib
 for i in `find stage -type f -name \*.a`; do
@@ -318,6 +330,11 @@ rm -rf $RPM_BUILD_ROOT
 %postun date-time -p /sbin/ldconfig
 
 
+%post regex -p /sbin/ldconfig
+
+%postun regex -p /sbin/ldconfig
+
+
 %post doc -p /sbin/ldconfig
 
 %postun doc -p /sbin/ldconfig
@@ -370,6 +387,11 @@ rm -rf $RPM_BUILD_ROOT
 %manifest boost.manifest
 %defattr(-, root, root, -)
 %{_libdir}/libboost_date_time*.so.%{version}
+
+%files regex
+%manifest boost.manifest
+%defattr(-, root, root, -)
+%{_libdir}/libboost_regex*.so.%{version}
 
 %files doc
 %manifest boost.manifest
