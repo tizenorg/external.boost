@@ -13,26 +13,27 @@
 #include <boost/limits.hpp>
 #include <new>
 #include "../helpers/fwd.hpp"
-#include "../helpers/allocator.hpp"
 #include "../helpers/memory.hpp"
 
 namespace test
 {
 namespace exception
 {
-    namespace detail
-    {
-        namespace
-        {
-            test::detail::memory_tracker<test::malloc_allocator<int> > tracker;
-        }
-    }
-
     class object;
     class hash;
     class equal_to;
     template <class T> class allocator;
     object generate(object const*);
+
+    struct true_type
+    {
+        enum { value = true };
+    };
+
+    struct false_type
+    {
+        enum { value = false };
+    };
 
     class object
     {
@@ -249,7 +250,7 @@ namespace exception
             UNORDERED_SCOPE(allocator::allocator()) {
                 UNORDERED_EPOINT("Mock allocator default constructor.");
             }
-            detail::tracker.allocator_ref();
+            test::detail::tracker.allocator_ref();
         }
 
         template <class Y> allocator(allocator<Y> const& x) : tag_(x.tag_)
@@ -257,7 +258,7 @@ namespace exception
             UNORDERED_SCOPE(allocator::allocator()) {
                 UNORDERED_EPOINT("Mock allocator template copy constructor.");
             }
-            detail::tracker.allocator_ref();
+            test::detail::tracker.allocator_ref();
         }
 
         allocator(allocator const& x) : tag_(x.tag_)
@@ -265,11 +266,11 @@ namespace exception
             UNORDERED_SCOPE(allocator::allocator()) {
                 UNORDERED_EPOINT("Mock allocator copy constructor.");
             }
-            detail::tracker.allocator_ref();
+            test::detail::tracker.allocator_ref();
         }
 
         ~allocator() {
-            detail::tracker.allocator_unref();
+            test::detail::tracker.allocator_unref();
         }
 
         allocator& operator=(allocator const& x) {
@@ -307,7 +308,7 @@ namespace exception
                 ptr = (T*) malloc(n * sizeof(T));
                 if(!ptr) throw std::bad_alloc();
             }
-            detail::tracker.track_allocate((void*) ptr, n, sizeof(T), tag_);
+            test::detail::tracker.track_allocate((void*) ptr, n, sizeof(T), tag_);
             return pointer(ptr);
 
             //return pointer(static_cast<T*>(::operator new(n * sizeof(T))));
@@ -323,7 +324,7 @@ namespace exception
                 ptr = (T*) malloc(n * sizeof(T));
                 if(!ptr) throw std::bad_alloc();
             }
-            detail::tracker.track_allocate((void*) ptr, n, sizeof(T), tag_);
+            test::detail::tracker.track_allocate((void*) ptr, n, sizeof(T), tag_);
             return pointer(ptr);
 
             //return pointer(static_cast<T*>(::operator new(n * sizeof(T))));
@@ -333,32 +334,32 @@ namespace exception
         {
             //::operator delete((void*) p);
             if(p) {
-                detail::tracker.track_deallocate((void*) p, n, sizeof(T), tag_);
+                test::detail::tracker.track_deallocate((void*) p, n, sizeof(T), tag_);
                 using namespace std;
                 free(p);
             }
         }
 
         void construct(pointer p, T const& t) {
-            UNORDERED_SCOPE(allocator::construct(pointer, T)) {
+            UNORDERED_SCOPE(allocator::construct(T*, T)) {
                 UNORDERED_EPOINT("Mock allocator construct function.");
                 new(p) T(t);
             }
-            detail::tracker.track_construct((void*) p, sizeof(T), tag_);
+            test::detail::tracker.track_construct((void*) p, sizeof(T), tag_);
         }
 
-#if defined(BOOST_UNORDERED_STD_FORWARD)
-        template<class... Args> void construct(pointer p, Args&&... args) {
-            UNORDERED_SCOPE(allocator::construct(pointer, Args&&...)) {
+#if !defined(BOOST_NO_VARIADIC_TEMPLATES)
+        template<class... Args> void construct(T* p, BOOST_FWD_REF(Args)... args) {
+            UNORDERED_SCOPE(allocator::construct(pointer, BOOST_FWD_REF(Args)...)) {
                 UNORDERED_EPOINT("Mock allocator construct function.");
-                new(p) T(std::forward<Args>(args)...);
+                new(p) T(boost::forward<Args>(args)...);
             }
-            detail::tracker.track_construct((void*) p, sizeof(T), tag_);
+            test::detail::tracker.track_construct((void*) p, sizeof(T), tag_);
         }
 #endif
 
-        void destroy(pointer p) {
-            detail::tracker.track_destroy((void*) p, sizeof(T), tag_);
+        void destroy(T* p) {
+            test::detail::tracker.track_destroy((void*) p, sizeof(T), tag_);
             p->~T();
         }
 
@@ -368,6 +369,10 @@ namespace exception
             }
             return (std::numeric_limits<std::size_t>::max)();
         }
+
+        typedef true_type propagate_on_container_copy_assignment;
+        typedef true_type propagate_on_container_move_assignment;
+        typedef true_type propagate_on_container_swap;
     };
 
     template <class T>

@@ -4,9 +4,10 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include "../helpers/prefix.hpp"
-
 #include <boost/unordered_set.hpp>
 #include <boost/unordered_map.hpp>
+#include "../helpers/postfix.hpp"
+
 #include "../helpers/test.hpp"
 #include "../objects/test.hpp"
 #include "../helpers/random_values.hpp"
@@ -15,11 +16,9 @@
 #include "../helpers/input_iterator.hpp"
 #include "../helpers/invariants.hpp"
 
-#include <iostream>
-
 namespace constructor_tests {
 
-test::seed_t seed(356730);
+test::seed_t initialize_seed(356730);
 
 template <class T>
 void constructor_tests1(T*,
@@ -31,6 +30,8 @@ void constructor_tests1(T*,
 
     std::cerr<<"Construct 1\n";
     {
+        test::check_instances check_;
+
         T x(0, hf, eq);
         BOOST_TEST(x.empty());
         BOOST_TEST(test::equivalent(x.hash_function(), hf));
@@ -41,6 +42,8 @@ void constructor_tests1(T*,
 
     std::cerr<<"Construct 2\n";
     {
+        test::check_instances check_;
+
         T x(100, hf);
         BOOST_TEST(x.empty());
         BOOST_TEST(x.bucket_count() >= 100);
@@ -52,6 +55,8 @@ void constructor_tests1(T*,
 
     std::cerr<<"Construct 3\n";
     {
+        test::check_instances check_;
+
         T x(2000);
         BOOST_TEST(x.empty());
         BOOST_TEST(x.bucket_count() >= 2000);
@@ -63,6 +68,8 @@ void constructor_tests1(T*,
 
     std::cerr<<"Construct 4\n";
     {
+        test::check_instances check_;
+
         T x;
         BOOST_TEST(x.empty());
         BOOST_TEST(test::equivalent(x.hash_function(), hf));
@@ -73,6 +80,8 @@ void constructor_tests1(T*,
 
     std::cerr<<"Construct 5\n";
     {
+        test::check_instances check_;
+
         test::random_values<T> v(1000, generator);
         T x(v.begin(), v.end(), 10000, hf, eq);
         BOOST_TEST(x.bucket_count() >= 10000);
@@ -85,6 +94,8 @@ void constructor_tests1(T*,
 
     std::cerr<<"Construct 6\n";
     {
+        test::check_instances check_;
+
         test::random_values<T> v(10, generator);
         T x(v.begin(), v.end(), 10000, hf);
         BOOST_TEST(x.bucket_count() >= 10000);
@@ -97,6 +108,8 @@ void constructor_tests1(T*,
 
     std::cerr<<"Construct 7\n";
     {
+        test::check_instances check_;
+
         test::random_values<T> v(100, generator);
         T x(v.begin(), v.end(), 100);
         BOOST_TEST(x.bucket_count() >= 100);
@@ -109,6 +122,8 @@ void constructor_tests1(T*,
 
     std::cerr<<"Construct 8\n";
     {
+        test::check_instances check_;
+
         test::random_values<T> v(1, generator);
         T x(v.begin(), v.end());
         BOOST_TEST(test::equivalent(x.hash_function(), hf));
@@ -120,6 +135,8 @@ void constructor_tests1(T*,
 
     std::cerr<<"Construct 9\n";
     {
+        test::check_instances check_;
+
         T x(0, hf, eq, al);
         BOOST_TEST(x.empty());
         BOOST_TEST(test::equivalent(x.hash_function(), hf));
@@ -130,6 +147,8 @@ void constructor_tests1(T*,
 
     std::cerr<<"Construct 10\n";
     {
+        test::check_instances check_;
+
         test::random_values<T> v(1000, generator);
         T x(v.begin(), v.end(), 10000, hf, eq, al);
         BOOST_TEST(x.bucket_count() >= 10000);
@@ -142,6 +161,8 @@ void constructor_tests1(T*,
 
     std::cerr<<"Construct 11\n";
     {
+        test::check_instances check_;
+
         T x(al);
         BOOST_TEST(x.empty());
         BOOST_TEST(test::equivalent(x.hash_function(), hf));
@@ -167,6 +188,7 @@ void constructor_tests2(T*,
 
     std::cerr<<"Construct 1\n";
     {
+        test::check_instances check_;
         T x(10000, hf1, eq1);
         BOOST_TEST(x.bucket_count() >= 10000);
         BOOST_TEST(test::equivalent(x.hash_function(), hf1));
@@ -177,6 +199,7 @@ void constructor_tests2(T*,
 
     std::cerr<<"Construct 2\n";
     {
+        test::check_instances check_;
         T x(100, hf1);
         BOOST_TEST(x.empty());
         BOOST_TEST(x.bucket_count() >= 100);
@@ -188,6 +211,7 @@ void constructor_tests2(T*,
 
     std::cerr<<"Construct 3\n";
     {
+        test::check_instances check_;
         test::random_values<T> v(100, generator);
         T x(v.begin(), v.end(), 0, hf1, eq1);
         BOOST_TEST(test::equivalent(x.hash_function(), hf1));
@@ -199,6 +223,7 @@ void constructor_tests2(T*,
 
     std::cerr<<"Construct 4\n";
     {
+        test::check_instances check_;
         test::random_values<T> v(5, generator);
         T x(v.begin(), v.end(), 1000, hf1);
         BOOST_TEST(x.bucket_count() >= 1000);
@@ -212,6 +237,7 @@ void constructor_tests2(T*,
 
     std::cerr<<"Construct 5\n";
     {
+        test::check_instances check_;
         test::random_values<T> v(100, generator);
         T x(v.begin(), v.end(), 0, hf, eq, al1);
         T y(x.begin(), x.end(), 0, hf1, eq1, al2);
@@ -223,6 +249,7 @@ void constructor_tests2(T*,
 
     std::cerr<<"Construct 6\n";
     {
+        test::check_instances check_;
         test::random_values<T> v(100, generator);
         T x(v.begin(), v.end(), 0, hf1, eq1);
         T y(x.begin(), x.end(), 0, hf, eq);
@@ -234,6 +261,7 @@ void constructor_tests2(T*,
 
     std::cerr<<"Construct 7\n";
     {
+        test::check_instances check_;
         test::random_values<T> v(100, generator);
         T x(v.begin(), v.end(), 0, hf1, eq1);
         T y(x.begin(), x.end(), 0, hf2, eq2);
@@ -245,6 +273,7 @@ void constructor_tests2(T*,
 
     std::cerr<<"Construct 8 - from input iterator\n";
     {
+        test::check_instances check_;
         test::random_values<T> v(100, generator);
         BOOST_DEDUCED_TYPENAME test::random_values<T>::const_iterator
             v_begin = v.begin(), v_end = v.end();
@@ -262,6 +291,7 @@ void constructor_tests2(T*,
     
     std::cerr<<"Construct 8.5 - from copy iterator\n";
     {
+        test::check_instances check_;
         test::random_values<T> v(100, generator);
         T x(test::copy_iterator(v.begin()),
             test::copy_iterator(v.end()), 0, hf1, eq1);
@@ -275,6 +305,8 @@ void constructor_tests2(T*,
     
     std::cerr<<"Construct 9\n";
     {
+        test::check_instances check_;
+
         test::random_values<T> v(100, generator);
         T x(50);
         BOOST_TEST(x.bucket_count() >= 50);
@@ -286,11 +318,13 @@ void constructor_tests2(T*,
         test::check_equivalent_keys(x);
     }
 
-#if !defined(BOOST_NO_0X_HDR_INITIALIZER_LIST)
+#if !defined(BOOST_NO_CXX11_HDR_INITIALIZER_LIST)
     std::initializer_list<BOOST_DEDUCED_TYPENAME T::value_type> list;
     
     std::cerr<<"Initializer list construct 1\n";
     {
+        test::check_instances check_;
+
         T x(list);
         BOOST_TEST(x.empty());
         BOOST_TEST(test::equivalent(x.hash_function(), hf));
@@ -300,6 +334,8 @@ void constructor_tests2(T*,
 
     std::cerr<<"Initializer list construct 2\n";
     {
+        test::check_instances check_;
+
         T x(list, 1000);
         BOOST_TEST(x.empty());
         BOOST_TEST(x.bucket_count() >= 1000);
@@ -310,6 +346,8 @@ void constructor_tests2(T*,
 
     std::cerr<<"Initializer list construct 3\n";
     {
+        test::check_instances check_;
+
         T x(list, 10, hf1);
         BOOST_TEST(x.empty());
         BOOST_TEST(x.bucket_count() >= 10);
@@ -320,6 +358,8 @@ void constructor_tests2(T*,
 
     std::cerr<<"Initializer list construct 4\n";
     {
+        test::check_instances check_;
+
         T x(list, 10, hf1, eq1);
         BOOST_TEST(x.empty());
         BOOST_TEST(x.bucket_count() >= 10);
@@ -330,6 +370,8 @@ void constructor_tests2(T*,
 
     std::cerr<<"Initializer list construct 5\n";
     {
+        test::check_instances check_;
+
         T x(list, 10, hf1, eq1, al1);
         BOOST_TEST(x.empty());
         BOOST_TEST(x.bucket_count() >= 10);
@@ -360,24 +402,28 @@ void map_constructor_test(T* = 0,
     test::check_equivalent_keys(x);
 }
 
-boost::unordered_set<test::object,
-    test::hash, test::equal_to,
-    test::allocator<test::object> >* test_set;
-boost::unordered_multiset<test::object,
-    test::hash, test::equal_to,
-    test::allocator<test::object> >* test_multiset;
 boost::unordered_map<test::object, test::object,
     test::hash, test::equal_to,
-    test::allocator<test::object> >* test_map;
+    std::allocator<test::object> >* test_map_std_alloc;
+
+boost::unordered_set<test::object,
+    test::hash, test::equal_to,
+    test::allocator1<test::object> >* test_set;
+boost::unordered_multiset<test::object,
+    test::hash, test::equal_to,
+    test::allocator2<test::object> >* test_multiset;
+boost::unordered_map<test::object, test::object,
+    test::hash, test::equal_to,
+    test::allocator2<test::object> >* test_map;
 boost::unordered_multimap<test::object, test::object,
     test::hash, test::equal_to,
-    test::allocator<test::object> >* test_multimap;
+    test::allocator1<test::object> >* test_multimap;
 
 using test::default_generator;
 using test::generate_collisions;
 
 UNORDERED_TEST(constructor_tests1,
-    ((test_set)(test_multiset)(test_map)(test_multimap))
+    ((test_map_std_alloc)(test_set)(test_multiset)(test_map)(test_multimap))
     ((default_generator)(generate_collisions))
 )
 
@@ -387,10 +433,10 @@ UNORDERED_TEST(constructor_tests2,
 )
 
 UNORDERED_TEST(map_constructor_test,
-    ((test_map)(test_multimap))
+    ((test_map_std_alloc)(test_map)(test_multimap))
 )
 
-#if !defined(BOOST_NO_0X_HDR_INITIALIZER_LIST)
+#if !defined(BOOST_NO_CXX11_HDR_INITIALIZER_LIST)
 
 UNORDERED_AUTO_TEST(test_default_initializer_list) {
     std::cerr<<"Initializer List Tests\n";
@@ -401,8 +447,7 @@ UNORDERED_AUTO_TEST(test_default_initializer_list) {
 
 #endif
 
-#if !defined(BOOST_NO_0X_HDR_INITIALIZER_LIST) && \
-    !defined(BOOST_NO_INITIALIZER_LISTS)
+#if !defined(BOOST_NO_CXX11_HDR_INITIALIZER_LIST)
 
 UNORDERED_AUTO_TEST(test_initializer_list) {
     std::cerr<<"Initializer List Tests\n";

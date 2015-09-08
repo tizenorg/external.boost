@@ -179,6 +179,10 @@ void instantiate(RealType)
    (boost::math::isnormal)(v1);
    (boost::math::isnan)(v1);
    (boost::math::isinf)(v1);
+   (boost::math::signbit)(v1);
+   (boost::math::copysign)(v1, v2);
+   (boost::math::changesign)(v1);
+   (boost::math::sign)(v1);
    boost::math::log1p(v1);
    boost::math::expm1(v1);
    boost::math::cbrt(v1);
@@ -228,12 +232,23 @@ void instantiate(RealType)
    boost::math::sph_bessel(i, 1);
    boost::math::sph_neumann(i, v2);
    boost::math::sph_neumann(i, i);
+#ifdef TEST_COMPLEX
+   boost::math::cyl_hankel_1(v1, v2);
+   boost::math::cyl_hankel_1(i, v2);
+   boost::math::cyl_hankel_2(v1, v2);
+   boost::math::cyl_hankel_2(i, v2);
+   boost::math::sph_hankel_1(v1, v2);
+   boost::math::sph_hankel_1(i, v2);
+   boost::math::sph_hankel_2(v1, v2);
+   boost::math::sph_hankel_2(i, v2);
+#endif
    boost::math::expint(v1);
    boost::math::expint(i);
    boost::math::expint(i, v2);
    boost::math::expint(i, i);
    boost::math::zeta(v1);
    boost::math::zeta(i);
+   boost::math::owens_t(v1, v2);
    boost::math::trunc(v1);
    boost::math::itrunc(v1);
    boost::math::ltrunc(v1);
@@ -298,11 +313,6 @@ void instantiate(RealType)
    boost::math::ibetac_invb(v1, v2, v3, pol);
    boost::math::gamma_p_derivative(v2, v3, pol);
    boost::math::ibeta_derivative(v1, v2, v3, pol);
-   (boost::math::fpclassify)(v1);
-   (boost::math::isfinite)(v1);
-   (boost::math::isnormal)(v1);
-   (boost::math::isnan)(v1);
-   (boost::math::isinf)(v1);
    boost::math::log1p(v1, pol);
    boost::math::expm1(v1, pol);
    boost::math::cbrt(v1, pol);
@@ -351,12 +361,23 @@ void instantiate(RealType)
    boost::math::sph_bessel(i, 1, pol);
    boost::math::sph_neumann(i, v2, pol);
    boost::math::sph_neumann(i, i, pol);
+#ifdef TEST_COMPLEX
+   boost::math::cyl_hankel_1(v1, v2, pol);
+   boost::math::cyl_hankel_1(i, v2, pol);
+   boost::math::cyl_hankel_2(v1, v2, pol);
+   boost::math::cyl_hankel_2(i, v2, pol);
+   boost::math::sph_hankel_1(v1, v2, pol);
+   boost::math::sph_hankel_1(i, v2, pol);
+   boost::math::sph_hankel_2(v1, v2, pol);
+   boost::math::sph_hankel_2(i, v2, pol);
+#endif
    boost::math::expint(v1, pol);
    boost::math::expint(i, pol);
    boost::math::expint(i, v2, pol);
    boost::math::expint(i, i, pol);
    boost::math::zeta(v1, pol);
    boost::math::zeta(i, pol);
+   boost::math::owens_t(v1, v2, pol);
    //
    // These next functions are intended to be found via ADL:
    //
@@ -428,6 +449,10 @@ void instantiate(RealType)
    (test::isnormal)(v1);
    (test::isnan)(v1);
    (test::isinf)(v1);
+   (test::signbit)(v1);
+   (test::copysign)(v1, v2);
+   (test::changesign)(v1);
+   (test::sign)(v1);
    test::log1p(v1);
    test::expm1(v1);
    test::cbrt(v1);
@@ -476,12 +501,23 @@ void instantiate(RealType)
    test::sph_bessel(i, 1);
    test::sph_neumann(i, v2);
    test::sph_neumann(i, i);
+#ifdef TEST_COMPLEX
+   test::cyl_hankel_1(v1, v2);
+   test::cyl_hankel_1(i, v2);
+   test::cyl_hankel_2(v1, v2);
+   test::cyl_hankel_2(i, v2);
+   test::sph_hankel_1(v1, v2);
+   test::sph_hankel_1(i, v2);
+   test::sph_hankel_2(v1, v2);
+   test::sph_hankel_2(i, v2);
+#endif
    test::expint(v1);
    test::expint(i);
    test::expint(i, v2);
    test::expint(i, i);
    test::zeta(v1);
    test::zeta(i);
+   test::owens_t(v1, v2);
    test::trunc(v1);
    test::itrunc(v1);
    test::ltrunc(v1);
@@ -633,6 +669,8 @@ void instantiate_mixed(RealType)
    boost::math::sph_bessel(i, 1);
    boost::math::sph_neumann(i, lr);
    boost::math::sph_neumann(i, i);
+   boost::math::owens_t(fr, dr);
+   boost::math::owens_t(i, s);
 
    boost::math::policies::policy<> pol;
 
@@ -744,6 +782,8 @@ void instantiate_mixed(RealType)
    boost::math::sph_bessel(i, 1, pol);
    boost::math::sph_neumann(i, lr, pol);
    boost::math::sph_neumann(i, i, pol);
+   boost::math::owens_t(fr, dr, pol);
+   boost::math::owens_t(i, s, pol);
 
 
    test::tgamma(i);
@@ -858,6 +898,8 @@ void instantiate_mixed(RealType)
    test::sph_bessel(i, 1);
    test::sph_neumann(i, lr);
    test::sph_neumann(i, i);
+   test::owens_t(fr, dr);
+   test::owens_t(i, s);
 #endif
 }
 

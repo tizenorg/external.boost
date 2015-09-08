@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 //
-// (C) Copyright Ion Gaztanaga 2004-2009. Distributed under the Boost
+// (C) Copyright Ion Gaztanaga 2004-2011. Distributed under the Boost
 // Software License, Version 1.0. (See accompanying file
 // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
@@ -31,7 +31,7 @@
 
 using namespace boost::interprocess;
 
-//This test inserts messages with different priority and marks them with a 
+//This test inserts messages with different priority and marks them with a
 //time-stamp to check if receiver obtains highest priority messages first and
 //messages with same priority are received in fifo order
 bool test_priority_order()
@@ -43,9 +43,9 @@ bool test_priority_order()
          mq2
          (open_or_create, test::get_process_id_name(), 100, sizeof(std::size_t));
 
-      //We test that the queue is ordered by priority and in the 
+      //We test that the queue is ordered by priority and in the
       //same priority, is a FIFO
-      std::size_t recvd = 0;
+      message_queue::size_type recvd = 0;
       unsigned int priority = 0;
       std::size_t tstamp;
 
@@ -78,19 +78,19 @@ bool test_priority_order()
 }
 
 //[message_queue_test_test_serialize_db
-//This test creates a in memory data-base using Interprocess machinery and 
-//serializes it through a message queue. Then rebuilds the data-base in 
+//This test creates a in memory data-base using Interprocess machinery and
+//serializes it through a message queue. Then rebuilds the data-base in
 //another buffer and checks it against the original data-base
 bool test_serialize_db()
 {
-   //Typedef data to create a Interprocess map   
+   //Typedef data to create a Interprocess map  
    typedef std::pair<const std::size_t, std::size_t> MyPair;
    typedef std::less<std::size_t>   MyLess;
    typedef node_allocator<MyPair, managed_external_buffer::segment_manager>
       node_allocator_t;
-   typedef map<std::size_t, 
-               std::size_t, 
-               std::less<std::size_t>, 
+   typedef map<std::size_t,
+               std::size_t,
+               std::less<std::size_t>,
                node_allocator_t>
                MyMap;
 
@@ -114,12 +114,12 @@ bool test_serialize_db()
 
       //Construct the map in the first buffer
       MyMap *map1 = db_origin.construct<MyMap>("MyMap")
-                                       (MyLess(), 
+                                       (MyLess(),
                                        db_origin.get_segment_manager());
       if(!map1)
          return false;
 
-      //Fill map1 until is full 
+      //Fill map1 until is full
       try{
          std::size_t i = 0;
          while(1){
@@ -131,23 +131,23 @@ bool test_serialize_db()
 
       //Data control data sending through the message queue
       std::size_t sent = 0;
-      std::size_t recvd = 0;
-      std::size_t total_recvd = 0;
+      message_queue::size_type recvd = 0;
+      message_queue::size_type total_recvd = 0;
       unsigned int priority;
 
-      //Send whole first buffer through the mq1, read it 
+      //Send whole first buffer through the mq1, read it
       //through mq2 to the second buffer
       while(1){
          //Send a fragment of buffer1 through mq1
-         std::size_t bytes_to_send = MaxMsgSize < (db_origin.get_size() - sent) ? 
+		 std::size_t bytes_to_send = MaxMsgSize < (db_origin.get_size() - sent) ?
                                        MaxMsgSize : (db_origin.get_size() - sent);
          mq1.send( &static_cast<char*>(db_origin.get_address())[sent]
                , bytes_to_send
                , 0);
          sent += bytes_to_send;
          //Receive the fragment through mq2 to buffer_destiny
-         mq2.receive( &buffer_destiny[total_recvd]
-                  , BufferSize - recvd
+		 mq2.receive( &buffer_destiny[total_recvd]
+		          , BufferSize - recvd
                   , recvd
                   , priority);
          total_recvd += recvd;
@@ -157,13 +157,13 @@ bool test_serialize_db()
             break;
          }
       }
-      
-      //The buffer will contain a copy of the original database 
+     
+      //The buffer will contain a copy of the original database
       //so let's interpret the buffer with managed_external_buffer
       managed_external_buffer db_destiny(open_only, &buffer_destiny[0], BufferSize);
 
       //Let's find the map
-      std::pair<MyMap *, std::size_t> ret = db_destiny.find<MyMap>("MyMap");
+      std::pair<MyMap *, managed_external_buffer::size_type> ret = db_destiny.find<MyMap>("MyMap");
       MyMap *map2 = ret.first;
 
       //Check if we have found it
@@ -182,12 +182,13 @@ bool test_serialize_db()
       }
 
       //Now let's compare all db values
-      for(std::size_t i = 0, num_elements = map1->size(); i < num_elements; ++i){
+	  MyMap::size_type num_elements = map1->size();
+	  for(std::size_t i = 0; i < num_elements; ++i){
          if((*map1)[i] != (*map2)[i]){
             return false;
          }
       }
-      
+     
       //Destroy maps from db-s
       db_origin.destroy_ptr(map1);
       db_destiny.destroy_ptr(map2);
@@ -206,7 +207,7 @@ static boost::interprocess::message_queue *pmessage_queue;
 
 void receiver()
 {
-   std::size_t recvd_size;
+   boost::interprocess::message_queue::size_type recvd_size;
    unsigned int priority;
    int nummsg = NumMsg;
 
@@ -242,15 +243,15 @@ bool test_buffer_overflow()
 
 int main ()
 {
-   if(!test_priority_order()){ 
+   if(!test_priority_order()){
       return 1;
    }
 
-   if(!test_serialize_db()){ 
+   if(!test_serialize_db()){
       return 1;
    }
 
-   if(!test_buffer_overflow()){ 
+   if(!test_buffer_overflow()){
       return 1;
    }
 

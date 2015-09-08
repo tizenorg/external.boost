@@ -3,8 +3,6 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include "../helpers/prefix.hpp"
-
 #include "./containers.hpp"
 #include "../helpers/random_values.hpp"
 #include "../helpers/invariants.hpp"
@@ -13,7 +11,7 @@
 #pragma warning(disable:4512) // assignment operator could not be generated
 #endif
 
-test::seed_t seed(9387);
+test::seed_t initialize_seed(9387);
 
 template <class T>
 struct self_swap_base : public test::exception_base
@@ -27,13 +25,12 @@ struct self_swap_base : public test::exception_base
     void check BOOST_PREVENT_MACRO_SUBSTITUTION(T const& x) const {
         std::string scope(test::scope);
 
-#if BOOST_UNORDERED_SWAP_METHOD != 2
+        // TODO: In C++11 exceptions are only allowed in the swap function.
         BOOST_TEST(
-                scope == "hash::operator(hash)" ||
+                scope == "hash::hash(hash)" ||
                 scope == "hash::operator=(hash)" ||
-                scope == "equal_to::operator(equal_to)" ||
+                scope == "equal_to::equal_to(equal_to)" ||
                 scope == "equal_to::operator=(equal_to)");
-#endif
 
         test::check_equivalent_keys(x);
     }
@@ -82,13 +79,12 @@ struct swap_base : public test::exception_base
     void check BOOST_PREVENT_MACRO_SUBSTITUTION(data_type const& d) const {
         std::string scope(test::scope);
 
-#if BOOST_UNORDERED_SWAP_METHOD != 2
+        // TODO: In C++11 exceptions are only allowed in the swap function.
         BOOST_TEST(
-                scope == "hash::operator(hash)" ||
+                scope == "hash::hash(hash)" ||
                 scope == "hash::operator=(hash)" ||
-                scope == "equal_to::operator(equal_to)" ||
+                scope == "equal_to::equal_to(equal_to)" ||
                 scope == "equal_to::operator=(equal_to)");
-#endif
         
         test::check_equivalent_keys(d.x);
         test::check_equivalent_keys(d.y);

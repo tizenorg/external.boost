@@ -1,4 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright 2012 Eric Niebler
+
+  Distributed under the Boost
+  Software License, Version 1.0. (See accompanying
+  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+  -->
 <library-reference xmlns:xi="http://www.w3.org/2001/XInclude">
 
   <!-- classes -->
@@ -75,11 +82,16 @@
           <classname alt="boost::proto::assign">proto::assign</classname>
         </computeroutput>
       </listitem>
-      <!--<listitem>
+      <listitem>
         <computeroutput>
-          <classname alt="boost::proto::base_expr">proto::base_expr</classname>
+          <classname alt="boost::proto::basic_default_domain">proto::basic_default_domain</classname>
         </computeroutput>
-      </listitem>-->
+      </listitem>
+      <listitem>
+        <computeroutput>
+          <classname alt="boost::proto::basic_default_generator">proto::basic_default_generator</classname>
+        </computeroutput>
+      </listitem>
       <listitem>
         <computeroutput>
           <classname alt="boost::proto::basic_expr">proto::basic_expr</classname>
@@ -133,6 +145,11 @@
       <listitem>
         <computeroutput>
           <classname alt="boost::proto::callable">proto::callable</classname>
+        </computeroutput>
+      </listitem>
+      <listitem>
+        <computeroutput>
+          <classname alt="boost::proto::char_">proto::char_</classname>
         </computeroutput>
       </listitem>
       <listitem>
@@ -417,6 +434,16 @@
       </listitem>
       <listitem>
         <computeroutput>
+          <classname alt="boost::proto::int_">proto::int_</classname>
+        </computeroutput>
+      </listitem>
+      <listitem>
+        <computeroutput>
+          <classname alt="boost::proto::integral_c">proto::integral_c</classname>
+        </computeroutput>
+      </listitem>
+      <listitem>
+        <computeroutput>
           <classname alt="boost::proto::is_aggregate">proto::is_aggregate</classname>
         </computeroutput>
       </listitem>
@@ -488,6 +515,11 @@
       <listitem>
         <computeroutput>
           <classname alt="boost::proto::logical_or">proto::logical_or</classname>
+        </computeroutput>
+      </listitem>
+      <listitem>
+        <computeroutput>
+          <classname alt="boost::proto::long_">proto::long_</classname>
         </computeroutput>
       </listitem>
       <listitem>
@@ -573,6 +605,11 @@
       <listitem>
         <computeroutput>
           <classname alt="boost::proto::otherwise">proto::otherwise</classname>
+        </computeroutput>
+      </listitem>
+      <listitem>
+        <computeroutput>
+          <classname alt="boost::proto::pack">proto::pack</classname>
         </computeroutput>
       </listitem>
       <listitem>
@@ -708,6 +745,11 @@
       <listitem>
         <computeroutput>
           <classname alt="boost::proto::shift_right_assign">proto::shift_right_assign</classname>
+        </computeroutput>
+      </listitem>
+      <listitem>
+        <computeroutput>
+          <classname alt="boost::proto::size_t">proto::size_t</classname>
         </computeroutput>
       </listitem>
       <listitem>
@@ -1130,16 +1172,19 @@
   <xi:include href="reference/repeat.xml"/>
   <xi:include href="reference/tags.xml"/>
   <xi:include href="reference/traits.xml"/>
+  <xi:include href="reference/transform.xml"/>
   <xi:include href="reference/transform/arg.xml"/>
   <xi:include href="reference/transform/call.xml"/>
   <xi:include href="reference/transform/default.xml"/>
   <xi:include href="reference/transform/fold.xml"/>
   <xi:include href="reference/transform/fold_tree.xml"/>
   <xi:include href="reference/transform/impl.xml"/>
+  <xi:include href="reference/transform/integral_c.xml"/>
   <xi:include href="reference/transform/lazy.xml"/>
   <xi:include href="reference/transform/make.xml"/>
   <xi:include href="reference/transform/pass_through.xml"/>
   <xi:include href="reference/transform/when.xml"/>
+  <xi:include href="reference/context.xml"/>
   <xi:include href="reference/context/callable.xml"/>
   <xi:include href="reference/context/default.xml"/>
   <xi:include href="reference/context/null.xml"/>

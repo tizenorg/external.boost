@@ -1,21 +1,24 @@
 Name: boost
 Summary: The Boost C++ Libraries
-Version: 1.46.1
+Version: 1.51.0
 Release: 5
-License: Boost
+License: BSL-1.0
 URL: http://www.boost.org/
 Group: System/Libraries
-Source: boost-1.46.1.tar.gz
+Source: boost-1.51.0.tar.gz
 Obsoletes: boost-doc <= 1.30.2
 Obsoletes: boost-python <= 1.30.2
 Provides: boost-doc = %{version}-%{release}
 
 # boost is an "umbrella" package that pulls in all other boost components
+Requires: boost-chrono = %{version}-%{release}
 Requires: boost-program-options = %{version}-%{release}
 Requires: boost-thread = %{version}-%{release}
 Requires: boost-test = %{version}-%{release}
 Requires: boost-filesystem = %{version}-%{release}
 Requires: boost-system = %{version}-%{release}
+Requires: boost-date-time = %{version}-%{release}
+Requires: boost-regex = %{version}-%{release}
 
 BuildRequires: libstdc++-devel
 BuildRequires: bzip2-libs
@@ -37,6 +40,12 @@ extensions and providing reference implementations so that the Boost
 libraries are suitable for eventual standardization. (Some of the
 libraries have already been proposed for inclusion in the C++
 Standards Committee's upcoming C++ Standard Library Technical Report.)
+%package chrono
+Summary: Run-Time component of boost chrono library
+Group: System Environment/Libraries
+Provides: libboost_chrono.so.%{version}
+%description chrono
+Run-Time support for Boost.Chrono, a set of useful time utilities.
 
 %package program-options
 Summary:  Runtime component of boost program_options library
@@ -84,15 +93,30 @@ Provides: libboost_filesystem.so.%{version}
 Runtime component Boost. FileSystem library, which provides facilities
 to manipulate files and directories, and the paths that identify them.
 
+%package date-time
+Summary:  A set of date-time libraries based on generic programming concepts. 
+Group: System/Libraries
+Provides: libboost_date_time.so.%{version}
+
+%description date-time
+
+The motivation for this library comes from working with and helping build several date-time libraries on several projects. 
+Date-time libraries provide fundamental infrastructure for most development projects. 
+
+%package regex
+Summary: Runtime component of boost system library
+Group: System/Libraries
+Provides: libboost_regex.so.%{version}
+Requires: libicu
+
+%description regex
+
+Runtime support for boost regular expression library.
 
 %package devel
 Summary: The Boost C++ headers and shared development libraries
 Group: Development/Libraries
 Requires: boost = %{version}-%{release}
-Requires: boost-program-options = %{version}-%{release}
-Requires: boost-thread = %{version}-%{release}
-Provides: boost-system = %{version}-%{release}
-Provides: boost-filesystem = %{version}-%{release}
 Provides: boost-devel = %{version}-%{release}
 
 %description devel
@@ -127,7 +151,7 @@ HTML documentation files for Boost C++ libraries.
 
 %prep
 %setup -q
-#%setup -q -n %{name}_1_46_1
+#%setup -q -n %{name}_1_51_0
 
 #%patch0 -p0
 #sed 's/_FEDORA_OPT_FLAGS/%{optflags}/' %{PATCH1} | %{__patch} -p0 --fuzz=0
@@ -142,11 +166,12 @@ HTML documentation files for Boost C++ libraries.
 BOOST_ROOT=`pwd`
 export BOOST_ROOT
 
-BOOST_LIBS="program_options,thread,system,filesystem,test"
+BOOST_LIBS="program_options,thread,system,filesystem,date_time,regex,test"
+REGEX_FLAGS="--with-icu"
 
 # build make tools, ie bjam, necessary for building libs, docs, and testing
 #(cd tools/jam/src && ./build.sh)
-./bootstrap.sh --with-libraries=$BOOST_LIBS
+./bootstrap.sh --with-libraries=$BOOST_LIBS $REGEX_FLAGS
 BJAM=`find . -name bjam -a -type f`
 ./bjam
 
@@ -198,8 +223,8 @@ BJAM=`find . -name bjam -a -type f`
 #  testarch=`uname -m`
 #  results=boost-results-$testdate-$testarch.tar.bz2
 #  tar -cvf boost-results-$testdate-$testarch.tar $results1 $results2
-#  bzip2 -f boost-results-$testdate-$testarch.tar 
-#  echo | mutt -s "$testdate boost regression $testarch" -a $results $email 
+#  bzip2 -f boost-results-$testdate-$testarch.tar
+#  echo | mutt -s "$testdate boost regression $testarch" -a $results $email
 #  echo "sending results finished"
 #else
 #  echo "error sending results"
@@ -211,6 +236,13 @@ rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT%{_libdir}
 mkdir -p $RPM_BUILD_ROOT%{_includedir}
 mkdir -p $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}
+
+mkdir -p %{buildroot}/%{_datadir}/license
+cp -rf %{_builddir}/%{name}-%{version}/packaging/%{name} %{buildroot}/%{_datadir}/license
+
+# LICENSE
+mkdir -p %{buildroot}/usr/share/license
+cp -af packaging/boost %{buildroot}/usr/share/license/%{name}
 
 # install lib
 for i in `find stage -type f -name \*.a`; do
@@ -271,6 +303,8 @@ rm -rf $RPM_BUILD_ROOT
 %postun -p /sbin/ldconfig
 
 
+%post chrono -p /sbin/ldconfig
+%postun chrono -p /sbin/ldconfig
 %post program-options -p /sbin/ldconfig
 
 %postun program-options -p /sbin/ldconfig
@@ -289,6 +323,16 @@ rm -rf $RPM_BUILD_ROOT
 %post filesystem -p /sbin/ldconfig
 
 %postun filesystem -p /sbin/ldconfig
+
+
+%post date-time -p /sbin/ldconfig
+
+%postun date-time -p /sbin/ldconfig
+
+
+%post regex -p /sbin/ldconfig
+
+%postun regex -p /sbin/ldconfig
 
 
 %post doc -p /sbin/ldconfig
@@ -312,24 +356,45 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %files
+%manifest boost.manifest
+%{_datadir}/license/%{name}
+%files chrono
+%manifest boost.manifest
+%defattr(-, root, root, -)
+%{_libdir}/libboost_chrono*.so.%{version}
 
 %files program-options
+%manifest boost.manifest
 %defattr(-, root, root, -)
 %{_libdir}/libboost_program_options*.so.%{version}
 
 %files thread
+%manifest boost.manifest
 %defattr(-, root, root, -)
 %{_libdir}/libboost_thread*.so.%{version}
 
 %files system
+%manifest boost.manifest
 %defattr(-, root, root, -)
 %{_libdir}/libboost_system*.so.%{version}
 
 %files filesystem
+%manifest boost.manifest
 %defattr(-, root, root, -)
 %{_libdir}/libboost_filesystem*.so.%{version}
 
+%files date-time
+%manifest boost.manifest
+%defattr(-, root, root, -)
+%{_libdir}/libboost_date_time*.so.%{version}
+
+%files regex
+%manifest boost.manifest
+%defattr(-, root, root, -)
+%{_libdir}/libboost_regex*.so.%{version}
+
 %files doc
+%manifest boost.manifest
 %defattr(-, root, root, -)
 %doc %{_docdir}/%{name}-%{version}
 
@@ -339,10 +404,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.so
 
 %files static
+%manifest boost.manifest
 %defattr(-, root, root, -)
 %{_libdir}/*.a
 
 %files test
+%manifest boost.manifest
 %defattr(-, root, root, -)
 %{_libdir}/libboost_unit_test_framework*.so.%{version}
 %{_libdir}/libboost_prg_exec_monitor*.so.%{version}

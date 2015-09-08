@@ -11,7 +11,6 @@
 
 #include <boost/uuid/sha1.hpp>
 #include <boost/detail/lightweight_test.hpp>
-#include "lightweight_test_ex.hpp"
 #include <algorithm>
 #include <cstring>
 #include <cstddef>
@@ -262,6 +261,24 @@ void test_short_messages()
 
         BOOST_TEST_SHA1_DEGEST(digest, tc.digest);
     }
+}
+
+void test_long()
+{
+    // test 1 million 'a's
+
+    boost::uuids::detail::sha1 sha;
+    for (size_t i=0; i<1000000; i++) {
+        sha.process_byte('a');
+    }
+
+    unsigned int correct_digest[5] = 
+        { 0x34aa973c, 0xd4c4daa4, 0xf61eeb2b, 0xdbad2731, 0x6534016f };
+
+    unsigned int digest[5];
+    sha.get_digest(digest);
+
+    BOOST_TEST_SHA1_DEGEST(digest, correct_digest);
 }
 
 int main(int, char*[])
