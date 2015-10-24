@@ -1,14 +1,15 @@
-Name: boost
+Name:    boost
 Summary: The Boost C++ Libraries
 Version: 1.51.0
-Release: 5
+Release: 6
 License: BSL-1.0
-URL: http://www.boost.org/
-Group: System/Libraries
-Source: boost-1.51.0.tar.gz
+URL:     http://www.boost.org/
+Group:   System/Libraries
+Source:  boost-1.51.0.tar.gz
+
 Obsoletes: boost-doc <= 1.30.2
 Obsoletes: boost-python <= 1.30.2
-Provides: boost-doc = %{version}-%{release}
+Provides:  boost-doc = %{version}-%{release}
 
 # boost is an "umbrella" package that pulls in all other boost components
 Requires: boost-chrono = %{version}-%{release}
@@ -19,6 +20,9 @@ Requires: boost-filesystem = %{version}-%{release}
 Requires: boost-system = %{version}-%{release}
 Requires: boost-date-time = %{version}-%{release}
 Requires: boost-regex = %{version}-%{release}
+Requires: boost-serialization = %{version}-%{release}
+Requires: boost-iostreams = %{version}-%{release}
+Requires: boost-random = %{version}-%{release}
 
 BuildRequires: libstdc++-devel
 BuildRequires: bzip2-libs
@@ -30,7 +34,6 @@ BuildRequires: chrpath
 
 %bcond_with tests
 %bcond_with docs_generated
-#%define sonamever 5
 
 %description
 Boost provides free peer-reviewed portable C++ source libraries.  The
@@ -40,10 +43,12 @@ extensions and providing reference implementations so that the Boost
 libraries are suitable for eventual standardization. (Some of the
 libraries have already been proposed for inclusion in the C++
 Standards Committee's upcoming C++ Standard Library Technical Report.)
+
 %package chrono
 Summary: Run-Time component of boost chrono library
 Group: System Environment/Libraries
 Provides: libboost_chrono.so.%{version}
+
 %description chrono
 Run-Time support for Boost.Chrono, a set of useful time utilities.
 
@@ -53,7 +58,6 @@ Group: System/Libraries
 Provides: libboost_program_options.so.%{version}
 
 %description program-options
-
 Runtime support of boost program options library, which allows program
 developers to obtain (name, value) pairs from the user, via
 conventional methods such as command line and config file.
@@ -64,12 +68,10 @@ Group: System/Libraries
 Provides: libboost_thread.so.%{version}
 
 %description thread
-
 Runtime component Boost.Thread library, which provides classes and
 functions for managing multiple threads of execution, and for
 synchronizing data between the threads or providing separate copies of
 data specific to individual threads.
-
 
 %package system
 Summary:  Runtime component of boost system library
@@ -77,7 +79,6 @@ Group: System/Libraries
 Provides: libboost_system.so.%{version}
 
 %description system
-
 Runtime component Boost. System library, which provides simple, light-weight
 error_code objects that encapsulate system-specific error code values,
 yet also provide access to more abstract and portable error conditions via
@@ -89,19 +90,17 @@ Group: System/Libraries
 Provides: libboost_filesystem.so.%{version}
 
 %description filesystem
-
 Runtime component Boost. FileSystem library, which provides facilities
 to manipulate files and directories, and the paths that identify them.
 
 %package date-time
-Summary:  A set of date-time libraries based on generic programming concepts. 
+Summary:  A set of date-time libraries based on generic programming concepts.
 Group: System/Libraries
 Provides: libboost_date_time.so.%{version}
 
 %description date-time
-
-The motivation for this library comes from working with and helping build several date-time libraries on several projects. 
-Date-time libraries provide fundamental infrastructure for most development projects. 
+The motivation for this library comes from working with and helping build several date-time libraries on several projects.
+Date-time libraries provide fundamental infrastructure for most development projects.
 
 %package regex
 Summary: Runtime component of boost system library
@@ -110,8 +109,31 @@ Provides: libboost_regex.so.%{version}
 Requires: libicu
 
 %description regex
-
 Runtime support for boost regular expression library.
+
+%package serialization
+Summary: Runtime component of boost serialization library
+Group: System/Libraries
+Provides: libboost_serialization.so.%{version}
+
+%description serialization
+Runtime support for serialization for persistence and marshalling.
+
+%package iostreams
+Summary: Runtime component of boost IOStreams library
+Group: System/Libraries
+Provides: libboost_iostreams.so.%{version}
+
+%description iostreams
+Runtime support for boost IOStreams library
+
+%package random
+Summary: Runtime component of boost random library
+Group: System/Libraries
+Provides: libboost_random.so.%{version}
+
+%description random
+Runtime support for boost random library
 
 %package devel
 Summary: The Boost C++ headers and shared development libraries
@@ -138,7 +160,6 @@ Group: System/Libraries
 Provides: libboost_test.so.%{version}
 
 %description test
-
 Boost Test
 
 %package doc
@@ -151,88 +172,23 @@ HTML documentation files for Boost C++ libraries.
 
 %prep
 %setup -q
-#%setup -q -n %{name}_1_51_0
-
-#%patch0 -p0
-#sed 's/_FEDORA_OPT_FLAGS/%{optflags}/' %{PATCH1} | %{__patch} -p0 --fuzz=0
-#%patch2 -p0
-#sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH3} | %{__patch} -p0 --fuzz=0
-#%patch4 -p0
-#%patch5 -p0
-#%patch6 -p0
-#%patch7 -p0
 
 %build
 BOOST_ROOT=`pwd`
 export BOOST_ROOT
 
-BOOST_LIBS="program_options,thread,system,filesystem,date_time,regex,test"
+BOOST_LIBS="program_options,thread,system,filesystem,date_time,regex,serialization,iostreams,random,test"
 REGEX_FLAGS="--with-icu"
 
 # build make tools, ie bjam, necessary for building libs, docs, and testing
 #(cd tools/jam/src && ./build.sh)
-./bootstrap.sh --with-libraries=$BOOST_LIBS $REGEX_FLAGS
-BJAM=`find . -name bjam -a -type f`
-./bjam
-
-#CONFIGURE_FLAGS="--with-toolset=gcc"
-#PYTHON_VERSION=$(python -c 'import sys; print sys.version[:3]')
-#PYTHON_FLAGS="--with-python-root=/usr --with-python-version=$PYTHON_VERSION"
-#REGEX_FLAGS="--with-icu"
-#./bootstrap.sh $CONFIGURE_FLAGS $PYTHON_FLAGS $REGEX_FLAGS
-
-#%ifarch %{arm}
-#LONGDOUBLE="--disable-long-double"
-#%else
-#LONGDOUBLE=""
-#%endif
-
-#BUILD_VARIANTS="variant=release threading=single,multi debug-symbols=on"
-#BUILD_FLAGS="-d2 --layout=system $BUILD_VARIANTS $LONGDOUBLE"
-#$BJAM $BUILD_FLAGS %{?_smp_mflags} stage
-
-# build docs, requires a network connection for docbook XSLT stylesheets
-#%if %{with docs_generated}
-#cd ./doc
-#chmod +x ../tools/boostbook/setup_boostbook.sh
-#../tools/boostbook/setup_boostbook.sh
-#USER_CFG=$BOOST_ROOT/tools/build/v2/user-config.jam
-#$BOOST_ROOT/$BJAM --v2 -sICU_PATH=/usr --user-config=$USER_CFG html
-#cd ..
-#%endif
-#
-#%check
-#%if %{with tests}
-#echo "<p>" `uname -a` "</p>" > status/regression_comment.html
-#echo "" >> status/regression_comment.html
-#echo "<p>" `g++ --version` "</p>" >> status/regression_comment.html
-#echo "" >> status/regression_comment.html
-#
-#cd tools/regression/build
-##$BOOST_ROOT/$BJAM
-#cd ../test
-##python ./test.py
-#cd ../../..
-#
-#results1=status/cs-`uname`.html
-#results2=status/cs-`uname`-links.html
-#email=benjamin.kosnik@gmail.com
-#if [ -f $results1 ] && [ -f $results2 ]; then
-#  echo "sending results starting"
-#  testdate=`date +%Y%m%d`
-#  testarch=`uname -m`
-#  results=boost-results-$testdate-$testarch.tar.bz2
-#  tar -cvf boost-results-$testdate-$testarch.tar $results1 $results2
-#  bzip2 -f boost-results-$testdate-$testarch.tar
-#  echo | mutt -s "$testdate boost regression $testarch" -a $results $email
-#  echo "sending results finished"
-#else
-#  echo "error sending results"
-#fi
-#%endif
+./bootstrap.sh --with-libraries=$BOOST_LIBS $REGEX_FLAGS --prefix=$RPM_BUILD_ROOT/usr --with-toolset=gcc
+#BJAM=`find . -name bjam -a -type f`
+#./b2
 
 %install
 rm -rf $RPM_BUILD_ROOT
+mkdir -p $RPM_BUILD_ROOT/usr
 mkdir -p $RPM_BUILD_ROOT%{_libdir}
 mkdir -p $RPM_BUILD_ROOT%{_includedir}
 mkdir -p $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}
@@ -244,40 +200,25 @@ cp -rf %{_builddir}/%{name}-%{version}/packaging/%{name} %{buildroot}/%{_datadir
 mkdir -p %{buildroot}/usr/share/license
 cp -af packaging/boost %{buildroot}/usr/share/license/%{name}
 
+./b2 install
+
 # install lib
-for i in `find stage -type f -name \*.a`; do
-  NAME=`basename $i`;
-  install -p -m 0644 $i $RPM_BUILD_ROOT%{_libdir}/$NAME;
-done;
-for i in `find stage \( -type f -o -type l \) -name \*.so*`; do
-  NAME=`basename $i`;
-  install -p -m 0644 $i $RPM_BUILD_ROOT%{_libdir}/$NAME;
-  strip $RPM_BUILD_ROOT%{_libdir}/$NAME;
-#  SONAME=$i.%{sonamever};
-#  VNAME=$i.%{version};
-#  base=`basename $i`;
-#  NAMEbase=$base;
-#  SONAMEbase=$base.%{sonamever};
-#  VNAMEbase=$base.%{version};
-#  mv $i $VNAME;
-#
-#  # remove rpath
-#  chrpath --delete $VNAME;
-#
-#  ln -s $VNAMEbase $SONAME;
-#  ln -s $VNAMEbase $NAME;
-#  install -p -m 755 $VNAME $RPM_BUILD_ROOT%{_libdir}/$VNAMEbase;
-#
-#  mv $SONAME $RPM_BUILD_ROOT%{_libdir}/$SONAMEbase;
-#  mv $NAME $RPM_BUILD_ROOT%{_libdir}/$NAMEbase;
-done;
+#for i in `find stage -type f -name \*.a`; do
+#  NAME=`basename $i`;
+#  install -p -m 0644 $i $RPM_BUILD_ROOT%{_libdir}/$NAME;
+#done;
+#for i in `find stage \( -type f -o -type l \) -name \*.so*`; do
+#  NAME=`basename $i`;
+#  install -p -m 0644 $i $RPM_BUILD_ROOT%{_libdir}/$NAME;
+#  strip $RPM_BUILD_ROOT%{_libdir}/$NAME;
+#done;
 
 # install include files
-find %{name} -type d | while read a; do
-  mkdir -p $RPM_BUILD_ROOT%{_includedir}/$a
-  find $a -mindepth 1 -maxdepth 1 -type f \
-  | xargs -r install -m 644 -p -t $RPM_BUILD_ROOT%{_includedir}/$a
-done
+#find %{name} -type d | while read a; do
+#  mkdir -p $RPM_BUILD_ROOT%{_includedir}/$a
+#  find $a -mindepth 1 -maxdepth 1 -type f \
+#  | xargs -r install -m 644 -p -t $RPM_BUILD_ROOT%{_includedir}/$a
+#done
 
 # install doc files
 DOCPATH=$RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/
@@ -292,6 +233,10 @@ done
 rm tmp-doc-directories
 install -p -m 644 -t $DOCPATH LICENSE_1_0.txt index.htm
 
+# install pkgconfig file
+mkdir -p $RPM_BUILD_ROOT%{_libdir}/pkgconfig
+install -D -m 644 packaging/boost.pc $RPM_BUILD_ROOT%{_libdir}/pkgconfig
+
 # remove scripts used to generate include files
 find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec rm {} \;
 
@@ -299,65 +244,54 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec rm 
 rm -rf $RPM_BUILD_ROOT
 
 %post -p /sbin/ldconfig
-
 %postun -p /sbin/ldconfig
-
 
 %post chrono -p /sbin/ldconfig
 %postun chrono -p /sbin/ldconfig
-%post program-options -p /sbin/ldconfig
 
+%post program-options -p /sbin/ldconfig
 %postun program-options -p /sbin/ldconfig
 
-
 %post thread -p /sbin/ldconfig
-
 %postun thread -p /sbin/ldconfig
 
-
 %post system -p /sbin/ldconfig
-
 %postun system -p /sbin/ldconfig
 
-
 %post filesystem -p /sbin/ldconfig
-
 %postun filesystem -p /sbin/ldconfig
 
-
 %post date-time -p /sbin/ldconfig
-
 %postun date-time -p /sbin/ldconfig
 
-
 %post regex -p /sbin/ldconfig
-
 %postun regex -p /sbin/ldconfig
 
+%post serialization -p /sbin/ldconfig
+%postun serialization -p /sbin/ldconfig
+
+%post iostreams -p /sbin/ldconfig
+%postun iostreams -p /sbin/ldconfig
+
+%post random -p /sbin/ldconfig
+%postun random -p /sbin/ldconfig
 
 %post doc -p /sbin/ldconfig
-
 %postun doc -p /sbin/ldconfig
 
-
 %post devel -p /sbin/ldconfig
-
 %postun devel -p /sbin/ldconfig
 
-
 %post static -p /sbin/ldconfig
-
 %postun static -p /sbin/ldconfig
 
-
 %post test -p /sbin/ldconfig
-
 %postun test -p /sbin/ldconfig
-
 
 %files
 %manifest boost.manifest
 %{_datadir}/license/%{name}
+
 %files chrono
 %manifest boost.manifest
 %defattr(-, root, root, -)
@@ -393,6 +327,22 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-, root, root, -)
 %{_libdir}/libboost_regex*.so.%{version}
 
+%files serialization
+%manifest boost.manifest
+%defattr(-, root, root, -)
+%{_libdir}/libboost_serialization*.so.%{version}
+%{_libdir}/libboost_wserialization*.so.%{version}
+
+%files iostreams
+%manifest boost.manifest
+%defattr(-, root, root, -)
+%{_libdir}/libboost_iostreams*.so.%{version}
+
+%files random
+%manifest boost.manifest
+%defattr(-, root, root, -)
+%{_libdir}/libboost_random*.so.%{version}
+
 %files doc
 %manifest boost.manifest
 %defattr(-, root, root, -)
@@ -402,6 +352,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-, root, root, -)
 %{_includedir}/boost
 %{_libdir}/*.so
+%{_libdir}/pkgconfig/boost.pc
 
 %files static
 %manifest boost.manifest
